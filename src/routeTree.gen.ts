@@ -9,8 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfilRouteImport } from './routes/profil'
+import { Route as PenugasanRouteImport } from './routes/penugasan'
+import { Route as ManajemenRouteImport } from './routes/manajemen'
+import { Route as EvaluasiRouteImport } from './routes/evaluasi'
+import { Route as AnalitikRouteImport } from './routes/analitik'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ProfilRoute = ProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PenugasanRoute = PenugasanRouteImport.update({
+  id: '/penugasan',
+  path: '/penugasan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManajemenRoute = ManajemenRouteImport.update({
+  id: '/manajemen',
+  path: '/manajemen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EvaluasiRoute = EvaluasiRouteImport.update({
+  id: '/evaluasi',
+  path: '/evaluasi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalitikRoute = AnalitikRouteImport.update({
+  id: '/analitik',
+  path: '/analitik',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +49,96 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/analitik': typeof AnalitikRoute
+  '/evaluasi': typeof EvaluasiRoute
+  '/manajemen': typeof ManajemenRoute
+  '/penugasan': typeof PenugasanRoute
+  '/profil': typeof ProfilRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/analitik': typeof AnalitikRoute
+  '/evaluasi': typeof EvaluasiRoute
+  '/manajemen': typeof ManajemenRoute
+  '/penugasan': typeof PenugasanRoute
+  '/profil': typeof ProfilRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/analitik': typeof AnalitikRoute
+  '/evaluasi': typeof EvaluasiRoute
+  '/manajemen': typeof ManajemenRoute
+  '/penugasan': typeof PenugasanRoute
+  '/profil': typeof ProfilRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/analitik'
+    | '/evaluasi'
+    | '/manajemen'
+    | '/penugasan'
+    | '/profil'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/analitik' | '/evaluasi' | '/manajemen' | '/penugasan' | '/profil'
+  id:
+    | '__root__'
+    | '/'
+    | '/analitik'
+    | '/evaluasi'
+    | '/manajemen'
+    | '/penugasan'
+    | '/profil'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnalitikRoute: typeof AnalitikRoute
+  EvaluasiRoute: typeof EvaluasiRoute
+  ManajemenRoute: typeof ManajemenRoute
+  PenugasanRoute: typeof PenugasanRoute
+  ProfilRoute: typeof ProfilRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profil': {
+      id: '/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof ProfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/penugasan': {
+      id: '/penugasan'
+      path: '/penugasan'
+      fullPath: '/penugasan'
+      preLoaderRoute: typeof PenugasanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manajemen': {
+      id: '/manajemen'
+      path: '/manajemen'
+      fullPath: '/manajemen'
+      preLoaderRoute: typeof ManajemenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/evaluasi': {
+      id: '/evaluasi'
+      path: '/evaluasi'
+      fullPath: '/evaluasi'
+      preLoaderRoute: typeof EvaluasiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analitik': {
+      id: '/analitik'
+      path: '/analitik'
+      fullPath: '/analitik'
+      preLoaderRoute: typeof AnalitikRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,7 +151,22 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnalitikRoute: AnalitikRoute,
+  EvaluasiRoute: EvaluasiRoute,
+  ManajemenRoute: ManajemenRoute,
+  PenugasanRoute: PenugasanRoute,
+  ProfilRoute: ProfilRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
