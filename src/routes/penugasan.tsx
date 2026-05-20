@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, Download, Plus, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, PewawancaraPill } from "@/components/AppLayout";
-import { penugasan, pewawancaraById, formatTanggalShort } from "@/data/seed";
+import { formatTanggalShort } from "@/data/seed";
+import { usePenugasan, usePewawancara } from "@/data/queries";
 
 export const Route = createFileRoute("/penugasan")({
   head: () => ({
@@ -20,6 +21,10 @@ function RiwayatPenugasan() {
   const [q, setQ] = useState("");
   const [tahun, setTahun] = useState("semua");
   const [page, setPage] = useState(1);
+  const { data: penugasan } = usePenugasan();
+  const { data: pewawancara } = usePewawancara();
+  const pewawancaraById = (id: string) => pewawancara.find((p) => p.id === id);
+
 
   const filtered = useMemo(() => {
     return penugasan.filter((s) => {
@@ -30,7 +35,7 @@ function RiwayatPenugasan() {
       const matchT = tahun === "semua" || s.tanggal.startsWith(tahun);
       return matchQ && matchT;
     }).sort((a, b) => b.tanggal.localeCompare(a.tanggal));
-  }, [q, tahun]);
+  }, [q, tahun, penugasan]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);

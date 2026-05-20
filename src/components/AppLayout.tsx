@@ -14,7 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
-import { notifikasi } from "@/data/seed";
+import { useNotifikasi } from "@/data/queries";
 
 const navItems = [
   { to: "/", label: "Ringkasan Eksekutif", icon: LayoutDashboard, end: true },
@@ -38,6 +38,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const meta = pageMeta[pathname] ?? pageMeta["/"];
   const [notifOpen, setNotifOpen] = useState(false);
+  const { data: notifikasi } = useNotifikasi();
   const unread = notifikasi.length;
 
   return (
