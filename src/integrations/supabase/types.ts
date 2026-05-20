@@ -14,7 +14,377 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audit_log: {
+        Row: {
+          actor: string | null
+          aksi: string
+          created_at: string
+          entitas: string
+          entitas_id: string
+          id: string
+          perubahan: Json | null
+        }
+        Insert: {
+          actor?: string | null
+          aksi: string
+          created_at?: string
+          entitas: string
+          entitas_id: string
+          id?: string
+          perubahan?: Json | null
+        }
+        Update: {
+          actor?: string | null
+          aksi?: string
+          created_at?: string
+          entitas?: string
+          entitas_id?: string
+          id?: string
+          perubahan?: Json | null
+        }
+        Relationships: []
+      }
+      evaluasi: {
+        Row: {
+          availability: number
+          created_at: string
+          id: string
+          kualitas: number
+          nilai_akhir: number
+          penugasan_id: string
+          pewawancara_id: string
+          substansi: number
+        }
+        Insert: {
+          availability: number
+          created_at?: string
+          id?: string
+          kualitas: number
+          nilai_akhir: number
+          penugasan_id: string
+          pewawancara_id: string
+          substansi: number
+        }
+        Update: {
+          availability?: number
+          created_at?: string
+          id?: string
+          kualitas?: number
+          nilai_akhir?: number
+          penugasan_id?: string
+          pewawancara_id?: string
+          substansi?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluasi_penugasan_id_fkey"
+            columns: ["penugasan_id"]
+            isOneToOne: false
+            referencedRelation: "penugasan"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluasi_pewawancara_id_fkey"
+            columns: ["pewawancara_id"]
+            isOneToOne: false
+            referencedRelation: "pewawancara"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jadwal_mendatang: {
+        Row: {
+          bank: string
+          calon: string
+          created_at: string
+          eksternal1_id: string | null
+          eksternal2_id: string | null
+          id: string
+          internal: string
+          jabatan: string
+          tanggal: string
+          undangan_terkirim: boolean
+          waktu: string
+        }
+        Insert: {
+          bank: string
+          calon: string
+          created_at?: string
+          eksternal1_id?: string | null
+          eksternal2_id?: string | null
+          id: string
+          internal: string
+          jabatan: string
+          tanggal: string
+          undangan_terkirim?: boolean
+          waktu: string
+        }
+        Update: {
+          bank?: string
+          calon?: string
+          created_at?: string
+          eksternal1_id?: string | null
+          eksternal2_id?: string | null
+          id?: string
+          internal?: string
+          jabatan?: string
+          tanggal?: string
+          undangan_terkirim?: boolean
+          waktu?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jadwal_mendatang_eksternal1_id_fkey"
+            columns: ["eksternal1_id"]
+            isOneToOne: false
+            referencedRelation: "pewawancara"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jadwal_mendatang_eksternal2_id_fkey"
+            columns: ["eksternal2_id"]
+            isOneToOne: false
+            referencedRelation: "pewawancara"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      karir: {
+        Row: {
+          id: string
+          instansi: string
+          jabatan: string
+          periode: string
+          pewawancara_id: string
+          urutan: number
+        }
+        Insert: {
+          id?: string
+          instansi: string
+          jabatan: string
+          periode: string
+          pewawancara_id: string
+          urutan?: number
+        }
+        Update: {
+          id?: string
+          instansi?: string
+          jabatan?: string
+          periode?: string
+          pewawancara_id?: string
+          urutan?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "karir_pewawancara_id_fkey"
+            columns: ["pewawancara_id"]
+            isOneToOne: false
+            referencedRelation: "pewawancara"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      keahlian: {
+        Row: {
+          id: string
+          nama: string
+          pewawancara_id: string
+        }
+        Insert: {
+          id?: string
+          nama: string
+          pewawancara_id: string
+        }
+        Update: {
+          id?: string
+          nama?: string
+          pewawancara_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "keahlian_pewawancara_id_fkey"
+            columns: ["pewawancara_id"]
+            isOneToOne: false
+            referencedRelation: "pewawancara"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifikasi: {
+        Row: {
+          created_at: string
+          dibaca: boolean
+          id: string
+          judul: string
+          pesan: string
+          tipe: Database["public"]["Enums"]["notifikasi_tipe"]
+        }
+        Insert: {
+          created_at?: string
+          dibaca?: boolean
+          id?: string
+          judul: string
+          pesan: string
+          tipe?: Database["public"]["Enums"]["notifikasi_tipe"]
+        }
+        Update: {
+          created_at?: string
+          dibaca?: boolean
+          id?: string
+          judul?: string
+          pesan?: string
+          tipe?: Database["public"]["Enums"]["notifikasi_tipe"]
+        }
+        Relationships: []
+      }
+      pendidikan: {
+        Row: {
+          bidang: string
+          id: string
+          institusi: string
+          jenjang: string
+          pewawancara_id: string
+          urutan: number
+        }
+        Insert: {
+          bidang: string
+          id?: string
+          institusi: string
+          jenjang: string
+          pewawancara_id: string
+          urutan?: number
+        }
+        Update: {
+          bidang?: string
+          id?: string
+          institusi?: string
+          jenjang?: string
+          pewawancara_id?: string
+          urutan?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pendidikan_pewawancara_id_fkey"
+            columns: ["pewawancara_id"]
+            isOneToOne: false
+            referencedRelation: "pewawancara"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      penugasan: {
+        Row: {
+          bank: string
+          calon: string
+          created_at: string
+          eksternal1_id: string | null
+          eksternal2_nama: string | null
+          id: string
+          internal: string
+          jabatan: string
+          status: Database["public"]["Enums"]["penugasan_status"]
+          tanggal: string
+        }
+        Insert: {
+          bank: string
+          calon: string
+          created_at?: string
+          eksternal1_id?: string | null
+          eksternal2_nama?: string | null
+          id: string
+          internal: string
+          jabatan: string
+          status?: Database["public"]["Enums"]["penugasan_status"]
+          tanggal: string
+        }
+        Update: {
+          bank?: string
+          calon?: string
+          created_at?: string
+          eksternal1_id?: string | null
+          eksternal2_nama?: string | null
+          id?: string
+          internal?: string
+          jabatan?: string
+          status?: Database["public"]["Enums"]["penugasan_status"]
+          tanggal?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "penugasan_eksternal1_id_fkey"
+            columns: ["eksternal1_id"]
+            isOneToOne: false
+            referencedRelation: "pewawancara"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pewawancara: {
+        Row: {
+          catatan: string | null
+          created_at: string
+          email: string | null
+          id: string
+          inisial: string
+          instansi_terakhir: string
+          jabatan_terakhir: string
+          nama: string
+          nik: string | null
+          no_telepon: string | null
+          nomor_sk: string | null
+          npwp: string | null
+          rekening: string | null
+          status: Database["public"]["Enums"]["pewawancara_status"]
+          tanggal_bergabung: string | null
+          tanggal_sk: string | null
+          tanggal_sk_expire: string | null
+          updated_at: string
+          warna: string
+        }
+        Insert: {
+          catatan?: string | null
+          created_at?: string
+          email?: string | null
+          id: string
+          inisial: string
+          instansi_terakhir: string
+          jabatan_terakhir: string
+          nama: string
+          nik?: string | null
+          no_telepon?: string | null
+          nomor_sk?: string | null
+          npwp?: string | null
+          rekening?: string | null
+          status?: Database["public"]["Enums"]["pewawancara_status"]
+          tanggal_bergabung?: string | null
+          tanggal_sk?: string | null
+          tanggal_sk_expire?: string | null
+          updated_at?: string
+          warna: string
+        }
+        Update: {
+          catatan?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          inisial?: string
+          instansi_terakhir?: string
+          jabatan_terakhir?: string
+          nama?: string
+          nik?: string | null
+          no_telepon?: string | null
+          nomor_sk?: string | null
+          npwp?: string | null
+          rekening?: string | null
+          status?: Database["public"]["Enums"]["pewawancara_status"]
+          tanggal_bergabung?: string | null
+          tanggal_sk?: string | null
+          tanggal_sk_expire?: string | null
+          updated_at?: string
+          warna?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +393,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      notifikasi_tipe: "warning" | "info" | "success" | "urgent"
+      penugasan_status: "selesai" | "terjadwal"
+      pewawancara_status: "aktif" | "tidak_aktif" | "baru_terdaftar"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +522,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      notifikasi_tipe: ["warning", "info", "success", "urgent"],
+      penugasan_status: ["selesai", "terjadwal"],
+      pewawancara_status: ["aktif", "tidak_aktif", "baru_terdaftar"],
+    },
   },
 } as const
