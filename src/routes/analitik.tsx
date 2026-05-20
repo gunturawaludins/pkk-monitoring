@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { TrendingUp, Users, Star, Building2, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/AppLayout";
-import { pewawancara, penugasan, evaluasi } from "@/data/seed";
+import { usePewawancara, usePenugasan, useEvaluasi } from "@/data/queries";
 
 export const Route = createFileRoute("/analitik")({
   head: () => ({
@@ -15,16 +15,19 @@ export const Route = createFileRoute("/analitik")({
 });
 
 function Analitik() {
+  const { data: pewawancara } = usePewawancara();
+  const { data: penugasan } = usePenugasan();
+  const { data: evaluasi } = useEvaluasi();
   const totalSesi = penugasan.length;
   const totalUsed = new Set(penugasan.map((s) => s.eksternal1Id)).size;
-  const avgSkor = (evaluasi.reduce((a, e) => a + e.nilaiAkhir, 0) / evaluasi.length).toFixed(1);
+  const avgSkor = evaluasi.length ? (evaluasi.reduce((a, e) => a + e.nilaiAkhir, 0) / evaluasi.length).toFixed(1) : "-";
 
   const distribusi = useMemo(() => {
     return pewawancara.map((p) => ({
       p,
       count: penugasan.filter((s) => s.eksternal1Id === p.id).length,
     })).sort((a, b) => b.count - a.count);
-  }, []);
+  }, [pewawancara, penugasan]);
 
   const maxDist = Math.max(...distribusi.map((d) => d.count), 1);
 
@@ -32,7 +35,7 @@ function Analitik() {
     const map = new Map<string, number>();
     penugasan.forEach((s) => map.set(s.bank, (map.get(s.bank) ?? 0) + 1));
     return [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
-  }, []);
+  }, [penugasan]);
   const maxBank = Math.max(...topBank.map(([, c]) => c), 1);
 
   const tren = useMemo(() => {
@@ -42,7 +45,7 @@ function Analitik() {
       const count = penugasan.filter((s) => s.tanggal.startsWith(`2026-${monthStr}`)).length;
       return { m, count, isProyeksi: i >= 4 };
     });
-  }, []);
+  }, [penugasan]);
   const maxTren = Math.max(...tren.map((t) => t.count), 1);
 
   return (

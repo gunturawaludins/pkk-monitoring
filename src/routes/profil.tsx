@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, X, GraduationCap, Briefcase, Phone, CreditCard, FileText, Upload, Download, Trash2, Edit, Mail, Star, ClipboardList } from "lucide-react";
 import { Card, StatusBadge } from "@/components/AppLayout";
-import { pewawancara, penugasan, evaluasi, type Pewawancara, type Status } from "@/data/seed";
+import { type Pewawancara, type Status, type Penugasan, type Evaluasi } from "@/data/seed";
+import { usePewawancara, usePenugasan, useEvaluasi } from "@/data/queries";
 
 export const Route = createFileRoute("/profil")({
   head: () => ({
@@ -18,6 +19,9 @@ function ProfilPage() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"semua" | Status | "belum">("semua");
   const [selected, setSelected] = useState<Pewawancara | null>(null);
+  const { data: pewawancara } = usePewawancara();
+  const { data: penugasan } = usePenugasan();
+  const { data: evaluasi } = useEvaluasi();
 
   const list = useMemo(() => {
     return pewawancara.filter((p) => {
@@ -30,7 +34,7 @@ function ProfilPage() {
         p.status === filter;
       return matchQ && matchF;
     });
-  }, [q, filter]);
+  }, [q, filter, pewawancara, penugasan]);
 
   return (
     <div className="space-y-6">
@@ -121,7 +125,7 @@ function ProfilPage() {
       </div>
 
       {/* Drawer */}
-      {selected && <DetailDrawer p={selected} onClose={() => setSelected(null)} />}
+      {selected && <DetailDrawer p={selected} penugasan={penugasan} evaluasi={evaluasi} onClose={() => setSelected(null)} />}
     </div>
   );
 }
@@ -135,7 +139,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function DetailDrawer({ p, onClose }: { p: Pewawancara; onClose: () => void }) {
+function DetailDrawer({ p, penugasan, evaluasi, onClose }: { p: Pewawancara; penugasan: Penugasan[]; evaluasi: Evaluasi[]; onClose: () => void }) {
   const sesi = penugasan.filter((s) => s.eksternal1Id === p.id);
   const evals = evaluasi.filter((e) => e.pewawancaraId === p.id);
   const avg = evals.length ? (evals.reduce((a, e) => a + e.nilaiAkhir, 0) / evals.length).toFixed(1) : "-";

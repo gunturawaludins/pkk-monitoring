@@ -4,7 +4,8 @@ import {
   TrendingUp, TrendingDown, Users, ClipboardCheck, Star, AlertTriangle,
   Calendar, ArrowRight, Bell, CheckCircle2, UserPlus,
 } from "lucide-react";
-import { pewawancara, penugasan, evaluasi, notifikasi, pewawancaraById, formatTanggalShort } from "@/data/seed";
+import { formatTanggalShort } from "@/data/seed";
+import { usePewawancara, usePenugasan, useEvaluasi, useNotifikasi } from "@/data/queries";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,11 +18,16 @@ export const Route = createFileRoute("/")({
 });
 
 function RingkasanEksekutif() {
-  const totalPewawancara = pewawancara.length;
+  const { data: pewawancara } = usePewawancara();
+  const { data: penugasan } = usePenugasan();
+  const { data: evaluasi } = useEvaluasi();
+  const { data: notifikasi } = useNotifikasi();
+  const pewawancaraById = (id: string) => pewawancara.find((p) => p.id === id);
+  const totalPewawancara = pewawancara.length || 1;
   const aktif = pewawancara.filter((p) => p.status === "aktif").length;
   const totalSesi = penugasan.length;
   const sesiBulanIni = penugasan.filter((s) => s.tanggal.startsWith("2026-05") || s.tanggal.startsWith("2026-04")).length;
-  const avgSkor = (evaluasi.reduce((a, e) => a + e.nilaiAkhir, 0) / evaluasi.length).toFixed(1);
+  const avgSkor = evaluasi.length ? (evaluasi.reduce((a, e) => a + e.nilaiAkhir, 0) / evaluasi.length).toFixed(1) : "-";
   const skExpireSoon = pewawancara.filter((p) => {
     const days = (new Date(p.tanggalSKExpire).getTime() - Date.now()) / 86400000;
     return days < 90;

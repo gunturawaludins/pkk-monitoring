@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Star, Plus, TrendingUp } from "lucide-react";
 import { Card, PewawancaraPill } from "@/components/AppLayout";
-import { pewawancara, penugasan, evaluasi, pewawancaraById, formatTanggalShort } from "@/data/seed";
+import { formatTanggalShort } from "@/data/seed";
+import { usePewawancara, usePenugasan, useEvaluasi } from "@/data/queries";
 
 export const Route = createFileRoute("/evaluasi")({
   head: () => ({
@@ -17,6 +18,10 @@ export const Route = createFileRoute("/evaluasi")({
 function EvaluasiKinerja() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [modal, setModal] = useState(false);
+  const { data: pewawancara } = usePewawancara();
+  const { data: penugasan } = usePenugasan();
+  const { data: evaluasi } = useEvaluasi();
+  const pewawancaraById = (id: string) => pewawancara.find((p) => p.id === id);
 
   const summary = useMemo(() => {
     return pewawancara.map((p) => {
@@ -33,12 +38,12 @@ function EvaluasiKinerja() {
         evals,
       };
     });
-  }, []);
+  }, [pewawancara, evaluasi]);
 
   const detailEvals = useMemo(() => {
     if (!selectedId) return evaluasi;
     return evaluasi.filter((e) => e.pewawancaraId === selectedId);
-  }, [selectedId]);
+  }, [selectedId, evaluasi]);
 
   return (
     <div className="space-y-6">

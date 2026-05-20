@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Plus, Send, CheckCircle2, Clock, Users, MapPin } from "lucide-react";
 import { Card, PewawancaraPill } from "@/components/AppLayout";
-import { jadwalMendatang, pewawancara, pewawancaraById, formatTanggal } from "@/data/seed";
+import { formatTanggal } from "@/data/seed";
+import { useJadwalMendatang, usePewawancara } from "@/data/queries";
 
 export const Route = createFileRoute("/manajemen")({
   head: () => ({
@@ -21,6 +22,9 @@ function ManajemenPenugasan() {
   const [bulan, setBulan] = useState(4); // Mei (index)
   const [tahun, setTahun] = useState(2026);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const { data: jadwalMendatang } = useJadwalMendatang();
+  const { data: pewawancara } = usePewawancara();
+  const pewawancaraById = (id: string) => pewawancara.find((p) => p.id === id);
 
   const days = useMemo(() => {
     const first = new Date(Date.UTC(tahun, bulan, 1));
@@ -205,6 +209,7 @@ function ManajemenPenugasan() {
 }
 
 function SelectPewawancara({ label }: { label: string }) {
+  const { data: pewawancara } = usePewawancara();
   return (
     <select className="block w-full rounded-lg border border-dashed border-accent/40 bg-accent/5 px-2 py-1 text-xs font-medium text-accent focus:outline-none">
       <option>⚡ Pilih {label}…</option>
