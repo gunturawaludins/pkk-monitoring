@@ -80,9 +80,13 @@ function RiwayatPenugasan() {
           <button className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold hover:bg-secondary">
             <Download className="h-3.5 w-3.5" /> Export Excel
           </button>
-          <button className="inline-flex items-center gap-1.5 rounded-lg bg-accent-gradient px-3 py-2 text-xs font-semibold text-white shadow-soft hover:opacity-95">
+          <button
+            onClick={openNew}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-accent-gradient px-3 py-2 text-xs font-semibold text-white shadow-soft hover:opacity-95"
+          >
             <Plus className="h-3.5 w-3.5" /> Tambah Sesi
           </button>
+
         </div>
       </Card>
 
