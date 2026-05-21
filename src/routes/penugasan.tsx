@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, Download, Plus, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Search, Download, Plus, ArrowUpDown, ChevronLeft, ChevronRight, Pencil, Trash2,
+} from "lucide-react";
 import { Card, PewawancaraPill } from "@/components/AppLayout";
-import { formatTanggalShort } from "@/data/seed";
-import { usePenugasan, usePewawancara } from "@/data/queries";
+import { formatTanggalShort, type Penugasan } from "@/data/seed";
+import { usePenugasan, usePewawancara, useDeletePenugasan } from "@/data/queries";
+import { PenugasanFormDialog } from "@/components/PenugasanFormDialog";
+
 
 export const Route = createFileRoute("/penugasan")({
   head: () => ({
