@@ -74,8 +74,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Dashboard Tim Klarifikasi PKK — OJK DIMB" },
+      { title: "Dashboard Tim Klarifikasi PKK - OJK DIMB" },
       { name: "description", content: "Dashboard internal Departemen Perizinan & Manajemen Krisis Perbankan (DIMB) untuk mengelola Tim Pewawancara Eksternal PKK." },
+      { property: "og:title", content: "Dashboard Tim Klarifikasi PKK - OJK DIMB" },
+      { name: "twitter:title", content: "Dashboard Tim Klarifikasi PKK - OJK DIMB" },
+      { property: "og:description", content: "Dashboard internal Departemen Perizinan & Manajemen Krisis Perbankan (DIMB) untuk mengelola Tim Pewawancara Eksternal PKK." },
+      { name: "twitter:description", content: "Dashboard internal Departemen Perizinan & Manajemen Krisis Perbankan (DIMB) untuk mengelola Tim Pewawancara Eksternal PKK." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e4af38f6-f83b-42ab-8447-16033225e687/id-preview-c11be3ff--60f7123a-6835-47ea-b40f-c2427e6ada10.lovable.app-1779330738516.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e4af38f6-f83b-42ab-8447-16033225e687/id-preview-c11be3ff--60f7123a-6835-47ea-b40f-c2427e6ada10.lovable.app-1779330738516.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
