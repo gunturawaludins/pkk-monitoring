@@ -25,9 +25,16 @@ function RiwayatPenugasan() {
   const [q, setQ] = useState("");
   const [tahun, setTahun] = useState("semua");
   const [page, setPage] = useState(1);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<Penugasan | null>(null);
   const { data: penugasan } = usePenugasan();
   const { data: pewawancara } = usePewawancara();
+  const del = useDeletePenugasan();
   const pewawancaraById = (id: string) => pewawancara.find((p) => p.id === id);
+  const openNew = () => { setEditing(null); setDialogOpen(true); };
+  const openEdit = (p: Penugasan) => { setEditing(p); setDialogOpen(true); };
+
+
 
 
   const filtered = useMemo(() => {
