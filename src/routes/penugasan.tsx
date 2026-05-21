@@ -105,6 +105,7 @@ function RiwayatPenugasan() {
                 <th className="px-4 py-3 font-semibold">Pewawancara Internal</th>
                 <th className="px-4 py-3 font-semibold">Pewawancara Eksternal 1</th>
                 <th className="px-4 py-3 font-semibold">Pewawancara Eksternal 2</th>
+                <th className="px-4 py-3 font-semibold text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -121,12 +122,30 @@ function RiwayatPenugasan() {
                     <td className="px-4 py-3 text-xs">{s.internal}</td>
                     <td className="px-4 py-3">{eks && <PewawancaraPill nama={eks.nama} warna={eks.warna} inisial={eks.inisial} />}</td>
                     <td className="px-4 py-3"><PewawancaraPill nama={s.eksternal2Nama} /></td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-1">
+                        <button
+                          onClick={() => openEdit(s)}
+                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-card hover:bg-secondary"
+                          title="Edit"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={() => confirm(`Hapus sesi ${s.bank}?`) && del.mutate(s.id)}
+                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-card hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+                          title="Hapus"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 );
               })}
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                  <td colSpan={9} className="px-4 py-16 text-center text-sm text-muted-foreground">
                     Tidak ada sesi yang cocok dengan pencarian.
                   </td>
                 </tr>
@@ -134,6 +153,7 @@ function RiwayatPenugasan() {
             </tbody>
           </table>
         </div>
+
 
         <div className="flex items-center justify-between border-t border-border px-4 py-3 text-xs">
           <div className="text-muted-foreground">
