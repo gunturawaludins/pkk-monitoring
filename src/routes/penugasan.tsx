@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, Download, Plus, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Search, Download, Plus, ArrowUpDown, ChevronLeft, ChevronRight, Pencil, Trash2,
+} from "lucide-react";
 import { Card, PewawancaraPill } from "@/components/AppLayout";
-import { formatTanggalShort } from "@/data/seed";
-import { usePenugasan, usePewawancara } from "@/data/queries";
+import { formatTanggalShort, type Penugasan } from "@/data/seed";
+import { usePenugasan, usePewawancara, useDeletePenugasan } from "@/data/queries";
+import { PenugasanFormDialog } from "@/components/PenugasanFormDialog";
+
 
 export const Route = createFileRoute("/penugasan")({
   head: () => ({
@@ -21,9 +25,16 @@ function RiwayatPenugasan() {
   const [q, setQ] = useState("");
   const [tahun, setTahun] = useState("semua");
   const [page, setPage] = useState(1);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<Penugasan | null>(null);
   const { data: penugasan } = usePenugasan();
   const { data: pewawancara } = usePewawancara();
+  const del = useDeletePenugasan();
   const pewawancaraById = (id: string) => pewawancara.find((p) => p.id === id);
+  const openNew = () => { setEditing(null); setDialogOpen(true); };
+  const openEdit = (p: Penugasan) => { setEditing(p); setDialogOpen(true); };
+
+
 
 
   const filtered = useMemo(() => {
@@ -69,9 +80,13 @@ function RiwayatPenugasan() {
           <button className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold hover:bg-secondary">
             <Download className="h-3.5 w-3.5" /> Export Excel
           </button>
-          <button className="inline-flex items-center gap-1.5 rounded-lg bg-accent-gradient px-3 py-2 text-xs font-semibold text-white shadow-soft hover:opacity-95">
+          <button
+            onClick={openNew}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-accent-gradient px-3 py-2 text-xs font-semibold text-white shadow-soft hover:opacity-95"
+          >
             <Plus className="h-3.5 w-3.5" /> Tambah Sesi
           </button>
+
         </div>
       </Card>
 
@@ -90,6 +105,7 @@ function RiwayatPenugasan() {
                 <th className="px-4 py-3 font-semibold">Pewawancara Internal</th>
                 <th className="px-4 py-3 font-semibold">Pewawancara Eksternal 1</th>
                 <th className="px-4 py-3 font-semibold">Pewawancara Eksternal 2</th>
+                <th className="px-4 py-3 font-semibold text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -106,12 +122,30 @@ function RiwayatPenugasan() {
                     <td className="px-4 py-3 text-xs">{s.internal}</td>
                     <td className="px-4 py-3">{eks && <PewawancaraPill nama={eks.nama} warna={eks.warna} inisial={eks.inisial} />}</td>
                     <td className="px-4 py-3"><PewawancaraPill nama={s.eksternal2Nama} /></td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-1">
+                        <button
+                          onClick={() => openEdit(s)}
+                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-card hover:bg-secondary"
+                          title="Edit"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={() => confirm(`Hapus sesi ${s.bank}?`) && del.mutate(s.id)}
+                          className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-card hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+                          title="Hapus"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 );
               })}
               {paginated.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                  <td colSpan={9} className="px-4 py-16 text-center text-sm text-muted-foreground">
                     Tidak ada sesi yang cocok dengan pencarian.
                   </td>
                 </tr>
@@ -119,6 +153,7 @@ function RiwayatPenugasan() {
             </tbody>
           </table>
         </div>
+
 
         <div className="flex items-center justify-between border-t border-border px-4 py-3 text-xs">
           <div className="text-muted-foreground">
@@ -143,6 +178,14 @@ function RiwayatPenugasan() {
           </div>
         </div>
       </Card>
+
+      <PenugasanFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        initial={editing}
+        pewawancara={pewawancara}
+      />
     </div>
   );
 }
+

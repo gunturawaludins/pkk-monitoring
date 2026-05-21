@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { AppLayout } from "@/components/AppLayout";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -114,6 +115,8 @@ function RootComponent() {
       <AppLayout>
         <Outlet />
       </AppLayout>
+      <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
 }
+

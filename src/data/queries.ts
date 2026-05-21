@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import type {
   Pewawancara,
   Penugasan,
@@ -139,3 +140,203 @@ function timeAgo(iso: string) {
 // ---------- helpers ----------
 export const byId = <T extends { id: string }>(arr: T[], id?: string) =>
   arr.find((x) => x.id === id);
+
+// ============= MUTATIONS =============
+
+export type JadwalInput = {
+  id?: string;
+  tanggal: string;
+  waktu: string;
+  bank: string;
+  calon: string;
+  jabatan: string;
+  internal: string;
+  eksternal1Id?: string;
+  eksternal2Id?: string;
+  undanganTerkirim?: boolean;
+};
+
+export function useUpsertJadwal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: JadwalInput) => {
+      const id = input.id ?? `JD-${Date.now().toString(36).toUpperCase()}`;
+      const row = {
+        id,
+        tanggal: input.tanggal,
+        waktu: input.waktu,
+        bank: input.bank,
+        calon: input.calon,
+        jabatan: input.jabatan,
+        internal: input.internal,
+        eksternal1_id: input.eksternal1Id || null,
+        eksternal2_id: input.eksternal2Id || null,
+        undangan_terkirim: input.undanganTerkirim ?? false,
+      };
+      const { error } = await supabase.from("jadwal_mendatang").upsert(row);
+      if (error) throw error;
+      await supabase.from("audit_log").insert({
+        aksi: input.id ? "UPDATE" : "CREATE",
+        entitas: "jadwal_mendatang",
+        entitas_id: id,
+        actor: "system",
+        perubahan: row,
+      });
+      return id;
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["jadwal_mendatang"] });
+      toast.success(v.id ? "Jadwal diperbarui" : "Jadwal baru ditambahkan");
+    },
+    onError: (e: Error) => toast.error(`Gagal: ${e.message}`),
+  });
+}
+
+export function useDeleteJadwal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("jadwal_mendatang").delete().eq("id", id);
+      if (error) throw error;
+      await supabase.from("audit_log").insert({
+        aksi: "DELETE", entitas: "jadwal_mendatang", entitas_id: id, actor: "system",
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["jadwal_mendatang"] });
+      toast.success("Jadwal dihapus");
+    },
+    onError: (e: Error) => toast.error(`Gagal: ${e.message}`),
+  });
+}
+
+export function useKirimUndangan() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("jadwal_mendatang")
+        .update({ undangan_terkirim: true })
+        .eq("id", id);
+      if (error) throw error;
+      await supabase.from("notifikasi").insert({
+        judul: "Undangan terkirim",
+        pesan: `Undangan sesi ${id} berhasil dikirim ke pewawancara eksternal.`,
+        tipe: "success",
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["jadwal_mendatang"] });
+      qc.invalidateQueries({ queryKey: ["notifikasi"] });
+      toast.success("Undangan terkirim");
+    },
+    onError: (e: Error) => toast.error(`Gagal: ${e.message}`),
+  });
+}
+
+export type PenugasanInput = {
+  id?: string;
+  tanggal: string;
+  bank: string;
+  calon: string;
+  jabatan: string;
+  internal: string;
+  eksternal1Id?: string;
+  eksternal2Nama?: string;
+  status?: "selesai" | "terjadwal";
+};
+
+export function useUpsertPenugasan() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: PenugasanInput) => {
+      const id = input.id ?? `PG-${Date.now().toString(36).toUpperCase()}`;
+      const row = {
+        id,
+        tanggal: input.tanggal,
+        bank: input.bank,
+        calon: input.calon,
+        jabatan: input.jabatan,
+        internal: input.internal,
+        eksternal1_id: input.eksternal1Id || null,
+        eksternal2_nama: input.eksternal2Nama || null,
+        status: input.status ?? "selesai",
+      };
+      const { error } = await supabase.from("penugasan").upsert(row);
+      if (error) throw error;
+      await supabase.from("audit_log").insert({
+        aksi: input.id ? "UPDATE" : "CREATE",
+        entitas: "penugasan",
+        entitas_id: id,
+        actor: "system",
+        perubahan: row,
+      });
+      return id;
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["penugasan"] });
+      toast.success(v.id ? "Sesi diperbarui" : "Sesi baru dicatat");
+    },
+    onError: (e: Error) => toast.error(`Gagal: ${e.message}`),
+  });
+}
+
+export function useDeletePenugasan() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("penugasan").delete().eq("id", id);
+      if (error) throw error;
+      await supabase.from("audit_log").insert({
+        aksi: "DELETE", entitas: "penugasan", entitas_id: id, actor: "system",
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["penugasan"] });
+      toast.success("Sesi dihapus");
+    },
+    onError: (e: Error) => toast.error(`Gagal: ${e.message}`),
+  });
+}
+
+// Tandai jadwal mendatang selesai → pindah ke tabel penugasan
+export function useTandaiSelesai() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (jadwal: JadwalMendatang) => {
+      const pewawancaraRes = await supabase.from("pewawancara").select("id,nama").in(
+        "id",
+        [jadwal.eksternal2Id].filter(Boolean) as string[],
+      );
+      const eks2Nama =
+        pewawancaraRes.data?.find((p) => p.id === jadwal.eksternal2Id)?.nama ?? "";
+      const pgId = `PG-${Date.now().toString(36).toUpperCase()}`;
+      const { error: e1 } = await supabase.from("penugasan").insert({
+        id: pgId,
+        tanggal: jadwal.tanggal,
+        bank: jadwal.bank,
+        calon: jadwal.calon,
+        jabatan: jadwal.jabatan,
+        internal: jadwal.internal,
+        eksternal1_id: jadwal.eksternal1Id || null,
+        eksternal2_nama: eks2Nama,
+        status: "selesai",
+      });
+      if (e1) throw e1;
+      const { error: e2 } = await supabase
+        .from("jadwal_mendatang").delete().eq("id", jadwal.id);
+      if (e2) throw e2;
+      await supabase.from("audit_log").insert({
+        aksi: "MARK_SELESAI", entitas: "jadwal_mendatang", entitas_id: jadwal.id,
+        actor: "system", perubahan: { penugasan_id: pgId },
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["jadwal_mendatang"] });
+      qc.invalidateQueries({ queryKey: ["penugasan"] });
+      toast.success("Sesi ditandai selesai & dipindahkan ke riwayat");
+    },
+    onError: (e: Error) => toast.error(`Gagal: ${e.message}`),
+  });
+}
+
