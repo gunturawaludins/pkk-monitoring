@@ -178,6 +178,14 @@ function RiwayatPenugasan() {
           </div>
         </div>
       </Card>
+
+      <PenugasanFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        initial={editing}
+        pewawancara={pewawancara}
+      />
     </div>
   );
 }
+
