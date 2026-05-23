@@ -128,9 +128,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <button className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium hover:bg-secondary transition-colors">
               <Download className="h-3.5 w-3.5" /> Ekspor
             </button>
-            <button className="inline-flex items-center gap-1.5 rounded-lg bg-accent-gradient px-3 py-2 text-xs font-semibold text-white shadow-soft hover:opacity-95 transition-opacity">
+            <Link to="/profil" className="inline-flex items-center gap-1.5 rounded-lg bg-accent-gradient px-3 py-2 text-xs font-semibold text-white shadow-soft hover:opacity-95 transition-opacity">
               <Plus className="h-3.5 w-3.5" /> Tambah Pewawancara
-            </button>
+            </Link>
           </div>
 
           <div className="relative">
