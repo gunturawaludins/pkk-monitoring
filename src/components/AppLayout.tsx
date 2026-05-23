@@ -36,7 +36,7 @@ const pageMeta: Record<string, { title: string; breadcrumb: string[] }> = {
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const meta = pageMeta[pathname] ?? pageMeta["/"];
+  const meta = pageMeta[pathname] ?? (pathname.startsWith("/profil/") ? { title: "Detail Profil Pewawancara", breadcrumb: ["DIMB", "Tim Klarifikasi", "Profil", "Detail"] } : pageMeta["/"]);
   const [notifOpen, setNotifOpen] = useState(false);
   const { data: notifikasi } = useNotifikasi();
   const unread = notifikasi.length;
