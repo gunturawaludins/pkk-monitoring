@@ -52,6 +52,11 @@ export function usePewawancara() {
   return { data: q.data ?? [], isLoading: q.isLoading };
 }
 
+export function usePewawancaraById(id: string | undefined) {
+  const { data } = usePewawancara();
+  return data.find((p) => p.id === id);
+}
+
 // ---------- Penugasan ----------
 async function fetchPenugasan(): Promise<Penugasan[]> {
   const { data } = await supabase.from("penugasan").select("*").order("tanggal");
