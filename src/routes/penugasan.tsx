@@ -120,7 +120,7 @@ function RiwayatPenugasan() {
                     <td className="px-4 py-3">{s.calon}</td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">{s.jabatan}</td>
                     <td className="px-4 py-3 text-xs">{s.internal}</td>
-                    <td className="px-4 py-3">{eks && <PewawancaraPill nama={eks.nama} warna={eks.warna} inisial={eks.inisial} />}</td>
+                    <td className="px-4 py-3">{eks && <PewawancaraPill nama={eks.nama} warna={eks.warna} inisial={eks.inisial} id={eks.id} />}</td>
                     <td className="px-4 py-3"><PewawancaraPill nama={s.eksternal2Nama} /></td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">

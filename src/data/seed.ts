@@ -31,6 +31,7 @@ export interface Pewawancara {
   tanggalSK: string;
   tanggalSKExpire: string;
   nomorSK: string;
+  fotoUrl?: string;
   pendidikan: Pendidikan[];
   karir: Karir[];
   keahlian: string[];

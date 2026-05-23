@@ -169,7 +169,7 @@ function EvaluasiKinerja() {
                       <div className="text-xs font-semibold">{sesi ? formatTanggalShort(sesi.tanggal) : "-"}</div>
                       <div className="text-xs text-muted-foreground truncate max-w-[260px]">{sesi?.bank}</div>
                     </td>
-                    <td className="px-4 py-3">{p && <PewawancaraPill nama={p.nama} warna={p.warna} inisial={p.inisial} />}</td>
+                    <td className="px-4 py-3">{p && <PewawancaraPill nama={p.nama} warna={p.warna} inisial={p.inisial} id={p.id} />}</td>
                     <td className="px-4 py-3 text-center font-medium">{e.availability}</td>
                     <td className="px-4 py-3 text-center font-medium">{e.kualitas}</td>
                     <td className="px-4 py-3 text-center font-medium">{e.substansi}</td>
