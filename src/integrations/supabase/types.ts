@@ -324,6 +324,7 @@ export type Database = {
           catatan: string | null
           created_at: string
           email: string | null
+          foto_url: string | null
           id: string
           inisial: string
           instansi_terakhir: string
@@ -345,6 +346,7 @@ export type Database = {
           catatan?: string | null
           created_at?: string
           email?: string | null
+          foto_url?: string | null
           id: string
           inisial: string
           instansi_terakhir: string
@@ -366,6 +368,7 @@ export type Database = {
           catatan?: string | null
           created_at?: string
           email?: string | null
+          foto_url?: string | null
           id?: string
           inisial?: string
           instansi_terakhir?: string
