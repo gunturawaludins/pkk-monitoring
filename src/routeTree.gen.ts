@@ -10,22 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as PenugasanRouteImport } from './routes/penugasan'
 import { Route as ManajemenRouteImport } from './routes/manajemen'
 import { Route as EvaluasiRouteImport } from './routes/evaluasi'
 import { Route as AnalitikRouteImport } from './routes/analitik'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProfilIndexRouteImport } from './routes/profil.index'
 import { Route as ProfilIdRouteImport } from './routes/profil.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfilRoute = ProfilRouteImport.update({
-  id: '/profil',
-  path: '/profil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PenugasanRoute = PenugasanRouteImport.update({
@@ -53,6 +48,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfilIndexRoute = ProfilIndexRouteImport.update({
+  id: '/profil/',
+  path: '/profil/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfilIdRoute = ProfilIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -65,9 +65,9 @@ export interface FileRoutesByFullPath {
   '/evaluasi': typeof EvaluasiRoute
   '/manajemen': typeof ManajemenRoute
   '/penugasan': typeof PenugasanRoute
-  '/profil': typeof ProfilRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/profil/$id': typeof ProfilIdRoute
+  '/profil/': typeof ProfilIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,9 +75,9 @@ export interface FileRoutesByTo {
   '/evaluasi': typeof EvaluasiRoute
   '/manajemen': typeof ManajemenRoute
   '/penugasan': typeof PenugasanRoute
-  '/profil': typeof ProfilRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/profil/$id': typeof ProfilIdRoute
+  '/profil': typeof ProfilIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,9 +86,9 @@ export interface FileRoutesById {
   '/evaluasi': typeof EvaluasiRoute
   '/manajemen': typeof ManajemenRoute
   '/penugasan': typeof PenugasanRoute
-  '/profil': typeof ProfilRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/profil/$id': typeof ProfilIdRoute
+  '/profil/': typeof ProfilIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -98,9 +98,9 @@ export interface FileRouteTypes {
     | '/evaluasi'
     | '/manajemen'
     | '/penugasan'
-    | '/profil'
     | '/sitemap.xml'
     | '/profil/$id'
+    | '/profil/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -108,9 +108,9 @@ export interface FileRouteTypes {
     | '/evaluasi'
     | '/manajemen'
     | '/penugasan'
-    | '/profil'
     | '/sitemap.xml'
     | '/profil/$id'
+    | '/profil'
   id:
     | '__root__'
     | '/'
@@ -118,9 +118,9 @@ export interface FileRouteTypes {
     | '/evaluasi'
     | '/manajemen'
     | '/penugasan'
-    | '/profil'
     | '/sitemap.xml'
     | '/profil/$id'
+    | '/profil/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -129,8 +129,8 @@ export interface RootRouteChildren {
   EvaluasiRoute: typeof EvaluasiRoute
   ManajemenRoute: typeof ManajemenRoute
   PenugasanRoute: typeof PenugasanRoute
-  ProfilRoute: typeof ProfilRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ProfilIndexRoute: typeof ProfilIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -140,13 +140,6 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profil': {
-      id: '/profil'
-      path: '/profil'
-      fullPath: '/profil'
-      preLoaderRoute: typeof ProfilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/penugasan': {
@@ -184,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profil/': {
+      id: '/profil/'
+      path: '/profil'
+      fullPath: '/profil/'
+      preLoaderRoute: typeof ProfilIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profil/$id': {
       id: '/profil/$id'
       path: '/$id'
@@ -194,26 +194,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface ProfilRouteChildren {
-  ProfilIdRoute: typeof ProfilIdRoute
-}
-
-const ProfilRouteChildren: ProfilRouteChildren = {
-  ProfilIdRoute: ProfilIdRoute,
-}
-
-const ProfilRouteWithChildren =
-  ProfilRoute._addFileChildren(ProfilRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalitikRoute: AnalitikRoute,
   EvaluasiRoute: EvaluasiRoute,
   ManajemenRoute: ManajemenRoute,
   PenugasanRoute: PenugasanRoute,
-  ProfilRoute: ProfilRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ProfilIndexRoute: ProfilIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
