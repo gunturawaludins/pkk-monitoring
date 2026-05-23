@@ -244,18 +244,16 @@ export function PewawancaraPill({
   nama,
   warna,
   inisial,
+  id,
 }: {
   nama: string;
   warna?: string;
   inisial?: string;
+  id?: string;
 }) {
-  const fallback = nama
-    .split(" ")
-    .map((s) => s[0])
-    .slice(0, 2)
-    .join("");
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary py-0.5 pl-0.5 pr-2.5 text-[11px] font-medium">
+  const fallback = nama.split(" ").map((s) => s[0]).slice(0, 2).join("");
+  const body = (
+    <>
       <span
         className="flex h-5 w-5 items-center justify-center rounded-full text-[9px] font-bold text-white"
         style={{ background: warna ?? "oklch(0.5 0.05 260)" }}
@@ -263,8 +261,17 @@ export function PewawancaraPill({
         {inisial ?? fallback}
       </span>
       <span className="truncate max-w-[140px]">{nama}</span>
-    </span>
+    </>
   );
+  const cls = "inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary py-0.5 pl-0.5 pr-2.5 text-[11px] font-medium";
+  if (id) {
+    return (
+      <Link to="/profil/$id" params={{ id }} className={`${cls} hover:bg-accent/10 hover:border-accent/40 transition-colors`}>
+        {body}
+      </Link>
+    );
+  }
+  return <span className={cls}>{body}</span>;
 }
 
 export { Search };
