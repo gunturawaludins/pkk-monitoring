@@ -35,6 +35,7 @@ async function fetchPewawancara(): Promise<Pewawancara[]> {
     tanggalSK: p.tanggal_sk ?? "",
     tanggalSKExpire: p.tanggal_sk_expire ?? "",
     nomorSK: p.nomor_sk ?? "",
+    fotoUrl: (p as { foto_url?: string | null }).foto_url ?? undefined,
     pendidikan: (pd ?? [])
       .filter((x) => x.pewawancara_id === p.id)
       .map((x) => ({ jenjang: x.jenjang, bidang: x.bidang, institusi: x.institusi })),
