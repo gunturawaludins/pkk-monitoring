@@ -346,3 +346,145 @@ export function useTandaiSelesai() {
   });
 }
 
+
+// ============= PEWAWANCARA MUTATIONS =============
+
+export type PewawancaraInput = {
+  id?: string;
+  nama: string;
+  jabatanTerakhir: string;
+  instansiTerakhir: string;
+  inisial: string;
+  warna: string;
+  status: Status;
+  nik?: string;
+  npwp?: string;
+  noTelepon?: string;
+  email?: string;
+  rekening?: string;
+  tanggalBergabung?: string;
+  tanggalSK?: string;
+  tanggalSKExpire?: string;
+  nomorSK?: string;
+  fotoUrl?: string;
+  pendidikan: { jenjang: string; bidang: string; institusi: string }[];
+  karir: { jabatan: string; instansi: string; periode: string }[];
+  keahlian: string[];
+  catatan?: string;
+};
+
+function slugId(nama: string) {
+  return (
+    "PW-" +
+    nama
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toUpperCase()
+      .replace(/[^A-Z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 40) +
+    "-" +
+    Date.now().toString(36).slice(-4).toUpperCase()
+  );
+}
+
+export function useUpsertPewawancara() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: PewawancaraInput) => {
+      const id = input.id ?? slugId(input.nama);
+      const row = {
+        id,
+        nama: input.nama,
+        jabatan_terakhir: input.jabatanTerakhir,
+        instansi_terakhir: input.instansiTerakhir,
+        inisial: input.inisial,
+        warna: input.warna,
+        status: input.status,
+        nik: input.nik || null,
+        npwp: input.npwp || null,
+        no_telepon: input.noTelepon || null,
+        email: input.email || null,
+        rekening: input.rekening || null,
+        tanggal_bergabung: input.tanggalBergabung || null,
+        tanggal_sk: input.tanggalSK || null,
+        tanggal_sk_expire: input.tanggalSKExpire || null,
+        nomor_sk: input.nomorSK || null,
+        foto_url: input.fotoUrl || null,
+        catatan: input.catatan || null,
+      };
+      const { error } = await supabase.from("pewawancara").upsert(row);
+      if (error) throw error;
+
+      // Replace children tables
+      await Promise.all([
+        supabase.from("pendidikan").delete().eq("pewawancara_id", id),
+        supabase.from("karir").delete().eq("pewawancara_id", id),
+        supabase.from("keahlian").delete().eq("pewawancara_id", id),
+      ]);
+      if (input.pendidikan.length) {
+        await supabase.from("pendidikan").insert(
+          input.pendidikan.map((p, i) => ({ ...p, pewawancara_id: id, urutan: i })),
+        );
+      }
+      if (input.karir.length) {
+        await supabase.from("karir").insert(
+          input.karir.map((k, i) => ({ ...k, pewawancara_id: id, urutan: i })),
+        );
+      }
+      if (input.keahlian.length) {
+        await supabase.from("keahlian").insert(
+          input.keahlian.map((nama) => ({ nama, pewawancara_id: id })),
+        );
+      }
+      await supabase.from("audit_log").insert({
+        aksi: input.id ? "UPDATE" : "CREATE",
+        entitas: "pewawancara",
+        entitas_id: id,
+        actor: "system",
+        perubahan: row,
+      });
+      return id;
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["pewawancara"] });
+      toast.success(v.id ? "Profil pewawancara diperbarui" : "Pewawancara baru ditambahkan");
+    },
+    onError: (e: Error) => toast.error(`Gagal: ${e.message}`),
+  });
+}
+
+export function useDeletePewawancara() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await Promise.all([
+        supabase.from("pendidikan").delete().eq("pewawancara_id", id),
+        supabase.from("karir").delete().eq("pewawancara_id", id),
+        supabase.from("keahlian").delete().eq("pewawancara_id", id),
+      ]);
+      const { error } = await supabase.from("pewawancara").delete().eq("id", id);
+      if (error) throw error;
+      await supabase.from("audit_log").insert({
+        aksi: "DELETE", entitas: "pewawancara", entitas_id: id, actor: "system",
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["pewawancara"] });
+      toast.success("Profil pewawancara dihapus");
+    },
+    onError: (e: Error) => toast.error(`Gagal: ${e.message}`),
+  });
+}
+
+export async function uploadFotoProfil(file: File): Promise<string> {
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage.from("foto-profil").upload(path, file, {
+    cacheControl: "3600",
+    upsert: false,
+  });
+  if (error) throw error;
+  const { data } = supabase.storage.from("foto-profil").getPublicUrl(path);
+  return data.publicUrl;
+}
