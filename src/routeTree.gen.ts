@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as PenugasanRouteImport } from './routes/penugasan'
 import { Route as ManajemenRouteImport } from './routes/manajemen'
 import { Route as EvaluasiRouteImport } from './routes/evaluasi'
@@ -21,6 +22,11 @@ import { Route as ProfilIdRouteImport } from './routes/profil.$id'
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfilRoute = ProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PenugasanRoute = PenugasanRouteImport.update({
@@ -49,9 +55,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfilIndexRoute = ProfilIndexRouteImport.update({
-  id: '/profil/',
-  path: '/profil/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProfilRoute,
 } as any)
 const ProfilIdRoute = ProfilIdRouteImport.update({
   id: '/$id',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/evaluasi': typeof EvaluasiRoute
   '/manajemen': typeof ManajemenRoute
   '/penugasan': typeof PenugasanRoute
+  '/profil': typeof ProfilRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/profil/$id': typeof ProfilIdRoute
   '/profil/': typeof ProfilIndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesById {
   '/evaluasi': typeof EvaluasiRoute
   '/manajemen': typeof ManajemenRoute
   '/penugasan': typeof PenugasanRoute
+  '/profil': typeof ProfilRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/profil/$id': typeof ProfilIdRoute
   '/profil/': typeof ProfilIndexRoute
@@ -98,6 +106,7 @@ export interface FileRouteTypes {
     | '/evaluasi'
     | '/manajemen'
     | '/penugasan'
+    | '/profil'
     | '/sitemap.xml'
     | '/profil/$id'
     | '/profil/'
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/evaluasi'
     | '/manajemen'
     | '/penugasan'
+    | '/profil'
     | '/sitemap.xml'
     | '/profil/$id'
     | '/profil/'
@@ -129,8 +139,8 @@ export interface RootRouteChildren {
   EvaluasiRoute: typeof EvaluasiRoute
   ManajemenRoute: typeof ManajemenRoute
   PenugasanRoute: typeof PenugasanRoute
+  ProfilRoute: typeof ProfilRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  ProfilIndexRoute: typeof ProfilIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -140,6 +150,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profil': {
+      id: '/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof ProfilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/penugasan': {
@@ -179,10 +196,10 @@ declare module '@tanstack/react-router' {
     }
     '/profil/': {
       id: '/profil/'
-      path: '/profil'
+      path: '/'
       fullPath: '/profil/'
       preLoaderRoute: typeof ProfilIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ProfilRoute
     }
     '/profil/$id': {
       id: '/profil/$id'
@@ -194,14 +211,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ProfilRouteChildren {
+  ProfilIdRoute: typeof ProfilIdRoute
+  ProfilIndexRoute: typeof ProfilIndexRoute
+}
+
+const ProfilRouteChildren: ProfilRouteChildren = {
+  ProfilIdRoute: ProfilIdRoute,
+  ProfilIndexRoute: ProfilIndexRoute,
+}
+
+const ProfilRouteWithChildren =
+  ProfilRoute._addFileChildren(ProfilRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalitikRoute: AnalitikRoute,
   EvaluasiRoute: EvaluasiRoute,
   ManajemenRoute: ManajemenRoute,
   PenugasanRoute: PenugasanRoute,
+  ProfilRoute: ProfilRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  ProfilIndexRoute: ProfilIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
