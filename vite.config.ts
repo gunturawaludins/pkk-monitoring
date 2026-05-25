@@ -12,4 +12,21 @@ export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
+  vite: {
+    plugins: [
+      {
+        name: 'resolve-injected-head-scripts',
+        resolveId(id) {
+          if (id === 'tanstack-start-injected-head-scripts:v') {
+            return '\0tanstack-start-injected-head-scripts:v';
+          }
+        },
+        load(id) {
+          if (id === '\0tanstack-start-injected-head-scripts:v') {
+            return 'export const injectedHeadScripts = "";';
+          }
+        }
+      }
+    ]
+  }
 });
